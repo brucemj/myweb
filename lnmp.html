@@ -1,0 +1,79 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+	<title>PHP+MYSQL安装配置</title>
+</head>
+<body>
+<hr>
+<h2>CentOS release 6.4 (Final): yum快速安装</h2>
+http://my.oschina.net/zhangdapeng89/blog/55119
+<ol>
+	<li>更改yum源为网易的源加快速度 ; yum -y update</li>
+	<pre>
+	cd /etc/yum.repos.d
+	mv CentOS-Base.repo CentOS-Base.repo.backup
+	wget http://mirrors.163.com/.help/CentOS6-Base-163.repo
+	mv CentOS6-Base-163.repo CentOS-Base.repo
+	yum clean all
+	yum install makecache
+	#makecache出错的话重试一两遍…… 
+</pre>
+	<br><li>升级所需的程序库</li>
+	<code>
+LANG=C <br>
+yum -y install gcc gcc-c++ autoconf libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel zlib zlib-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers <br>
+	</code>
+	<br><li>安装php和mysql</li>
+	<code>yum -y install php mysql mysql-server mysql-devel php-mysql php-cgi php-mbstring php-gd php-fastcgi</code><br>
+	<br><li>安装nginx (由于centos没有默认的nginx软件包，需要启用REHL的附件包)</li>
+	<pre>
+rpm -ivh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm <br>
+#查看yum的nginx信息： <br>
+yum info nginx <br>
+#安装并启动nignx: <br>
+yum -y install nginx ; service nginx start <br>
+chkconfig nginx on	</pre>
+	<br><li>安装spawn-fcgi来运行php-cgi</li>
+	<div style="color: red">
+	Nginx + FastCgi + Spawn-fcgi + c <br>
+	http://terry831010.blog.163.com/blog/static/6916117120126185428827/ <br>
+	</div>
+<pre>rpm -Uvh http://mirrors.neusoft.edu.cn/epel/5/x86_64/epel-release-5-4.noarch.rpm <br>
+yum install spawn-fcgi</pre>
+	<br><li>下载spawn-fcgi 的启动脚本</li>
+<pre>
+wget http://bash.cyberciti.biz/dl/419.sh.zip
+unzip 419.sh.zip
+mv 419.sh /etc/init.d/php_cgi
+chmod +x /etc/init.d/php_cgi
+启动php_cgi
+    /etc/init.d/php_cgi start
+查看进程
+    netstat -tulpn | grep :9000
+若出现如下代表一切正常
+    tcp 0 0 127.0.0.1:9000 0.0.0.0:* LISTEN 4352/php-cgi
+</pre>
+<br><li>配置nginx(详细配置见nginx.conf详细说明)</li>
+<pre>
+    location ~ \.php$ {
+    root html;
+    fastcgi_pass 127.0.0.1:9000;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME /usr/share/nginx/html$fastcgi_script_name;
+    include fastcgi_params;
+    }
+</pre>
+<br><li>查看phpinfo</li>
+<code>phpinfo();</code><br>
+<br><li>安装phpmyadmin</li>
+<pre>修改/var/lib/php/session的权限和nginx和php_cgi一致
+    chown -R www.www /var/lib/php/session
+</pre>
+
+</ol>
+<hr>	
+<h2>CentOS release 6.4 (Final): 源码安装</h2>
+<hr>
+</body>
+
+</html>
