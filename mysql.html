@@ -1,0 +1,425 @@
+﻿
+<ul>
+<th><h4>SQL分类</h4></th>
+	<li> DDL (Data fefinition Languages)</li>
+		<ol>
+			<li>创建数据库： create database test1;</li>
+			<li>删除数据库： drop database test1;</li>
+			<li>创建表： create table tablename(column_name_1  column_type_1  constraints , ... )</li>
+				<blockquote>
+				<div> create table emp( ename varchar(10) , hiredate date, sal decimal(10,2), deptno int(2) ); </div>
+				<div> desc emp;</div>
+				<div> show create table emp \G; </div>
+				</blockquote>
+			<li>删除表： drop table emp;</li>
+			<li>修改表</li>
+				<ul>
+					<li>修改表类型 ALTER TABLE tablename MODIFY [COLUMN] column_definition [FIRST | AFTER col_name]</li>
+						<blockquote>
+						<div> 修改ename字段类型： alter table emp modify ename varchar(20);</div>
+						</blockquote>
+					<li>增加表字段 ALTER TABLE tablename ADD [COLUMN] column_definition [FIRST | AFTER col_name]</li>
+						<blockquote>
+						<div> 新增加字段 age： alter table emp add column age int(3);</div>
+						</blockquote>
+					<li>删除表字段 ALTER TABLE tablename DROP [COLUMN] col_name</li>
+						<blockquote>
+							<div>删除age字段： alter table emp drop column age;</div>
+						</blockquote>
+					<li>字段改名 ALTER TABLE tablename CHANGE [COLUMN] old_col_name column_definition [FIRST|AFTER col_name]</li>
+						<blockquote>
+							<div>将 age 改名为 age1： alter table emp change age age1 int(3);</div>
+						</blockquote>
+					<li>修改字段排列顺序</li>
+						<blockquote>
+							<div>可选项 first|after column_name，这个选项可以用来修改字段在表中的位置</div>
+							<div>默认 ADD 增加的新字段是加在表的最后位置，而 CHANGE/MODIFY 默认都不会改变字段的位置。</div>
+							<div>例: 将新增的字段 birth date 加在 ename 之后</div>
+							<div>&nbsp&nbsp alter table emp add birth int(10) after ename;</div>
+							<div>例: 将age字段放在最前面</div>
+							<div>&nbsp&nbsp alter table emp modify age first; </div>
+						</blockquote>
+					<li>表改名 ALTER TABLE tablename RENAME [TO] new_tablename</li>
+						<blockquote>
+							<div>将表 emp 改名为 emp1: alter table emp rename emp1;</div>
+						</blockquote>
+					<li></li>
+				</ul>
+			<br />
+		</ol>
+	<li> DML (Data Manipulation Language)</li>
+		<ol>
+			<li>插入记录 INSERT INTO tablename (field1,field2,……fieldn) VALUES(value1,value2,……valuesn);</li>
+				<blockquote>
+					<div>insert into emp (age,ename,sal,deptno) values(19,'bruce',2000,3);</div>
+					<div>一次插入多条记录： insert into empt values('aa',4),('bb',5);</div>
+				</blockquote>
+			<li>更新记录 UPDATE tablename SET field1=value1，field2.=value2，……fieldn=valuen [WHERE CONDITION]</li>
+				<blockquote>
+					<div>update emp set sal=49999 where ename='bruce';</div>
+					<div>update emp set sal=491999, age=33 where ename='bruce';</div>
+					<div>同时更新多个表中数据</div>
+					<div>&nbsp&nbsp update empt ,emp  set empt.age=emp.age+3 where empt.ename=emp.ename;</div>
+					<div>&nbsp&nbsp update empt a,emp b set a.age=b.age*3 where a.ename=b.ename;</div>
+				</blockquote>
+			<li>删除记录 DELETE FROM tablename [WHERE CONDITION]</li>
+				<blockquote>
+					<div>删除表的全部记录【谨用】：delete from empt ;</div>
+					<div>一次删除多表记录： delete a,b from emp a,dept b where a.deptno=b.deptno and a.deptno=3;</div>
+				</blockquote>
+			<li>查询记录 SELECT * FROM tablename [WHERE CONDITION]
+				<ul>
+					<li>（1）查询不重复的记录。</li>
+						<blockquote>
+							<div>select ename,hiredate,sal,deptno from emp;</div>
+							<div>distinct关键字:  select distinct age from emp;</div>
+						</blockquote>
+					<li>（2）条件查询。</li>
+						<blockquote>
+							<div>select age, ename from emp where ename='bruce';</div>
+							<div>where 后面的条件，除了‘=’外，还可以使用>、<、>=、<=、!=等比较运算符；</div>
+							<div>多个条件之间还可以使用 or、and 等逻辑运算符进行多条件联合查询</div>
+							<div>select * from emp where sal > 44444 and age < 65;</div>
+						</blockquote>
+					<li>（3）排序和限制。 SELECT * FROM tablename [WHERE CONDITION] [ORDER BY field1 [DESC|ASC] ， field2 [DESC|ASC]，……fieldn [DESC|ASC]]</li>
+						<blockquote>
+							<div>DESC 表示按照字段进行降序排列，ASC 则表示升序排列，如果不写此关键字默认是升序排列。</div>
+							<div>select * from emp order by sal;</div>
+							<div>如果排序字段的值一样，则值相同的字段按照第二个排序字段进行排序，以此类推。</div>
+							<div>对于排序后的记录，如果希望只显示一部分，而不是全部，这时，就可以使用 LIMIT 关键字</div>
+							<div>SELECT ……[LIMIT offset_start,row_count]</div>
+							<div>其中 offset_start 表示记录的起始偏移量，row_count 表示显示的行数。</div>
+							<div>在默认情况下，起始偏移量为 0，只需要写记录行数就可以，这时候，显示的实际就是前 n条记录</div>
+							<div>select * from emp order by sal limit 3;</div>
+						</blockquote>
+					<li>（4）聚合。</li>
+						<code>
+							<br />聚合操作的语法如下： 
+							<br />SELECT [field1,field2,……fieldn] fun_name
+							<br />FROM tablename
+							<br />[WHERE where_contition]
+							<br />[GROUP BY field1,field2,……fieldn
+							<br />[WITH ROLLUP]]
+							<br />[HAVING where_contition]
+						</code>
+						<code id="args">
+							<br /><small>对其参数进行以下说明。</small>
+							<br />fun_name 表示要做的聚合操作，也就是聚合函数，常用的有 sum（求和）、count(*)（记
+							录数）、max（最大值）、min（最小值）。
+							<br />GROUP BY 关键字表示要进行分类聚合的字段，比如要按照部门分类统计员工数量，部门
+							就应该写在 group by 后面。
+							<br />WITH ROLLUP 是可选语法，表明是否对分类聚合后的结果进行再汇总。
+							<br />HAVING 关键字表示对分类后的结果再进行条件的过滤。
+							<br />注意：having 和 where 的区别在于 having 是对聚合后的结果进行条件的过滤，
+							<br />而 where 是在聚合前就对记录进行过滤，
+							<br />如果逻辑允许，我们尽可能用 where 先过滤记录，
+							<br />这样因为结果集减小，将对聚合的效率大大提高，最后再根据逻辑看是否用 having 进行再过滤。
+						</code>
+						<blockquote>
+							<div>要 emp 表中统计公司的总人数：  select count(1) from emp;</div>
+							<div>在此基础上，要统计各个部门的人数：</div>
+							<div>select deptno,count(1) from emp group by deptno;</div>
+							<div>更细一些，既要统计各部门人数，又要统计总人数：</div>
+							<div>select deptno,count(1) from emp group by deptno with rollup;</div>
+							<div>统计人数大于 1 人的部门：</div>
+							<div>select deptno,count(1) from emp group by deptno having count(1)>1;</div>
+							<div>统计公司所有员工的薪水总额、最高和最低薪水：</div>
+							<div>select sum(sal),max(sal),min(sal) from emp;</div>
+						</blockquote>
+					<li>（5）表连接。</li>
+						<code>
+							<br />当需要同时显示多个表中的字段时，就可以用表连接来实现这样的功能。
+							<br />从大类上分， 表连接分为内连接和外连接， 
+							<br />它们之间的最主要区别是內连接仅选出两张表中互相匹配的记录，
+							<br />而外连接会选出其他不匹配的记录。我们最常用的是内连接。
+							<br />例如，查询出所有雇员的名字和所在部门名称，
+							<br />因为雇员名称和部门分别存放在表 emp 和dept 中，因此，需要使用表连接来进行查询：
+						</code>
+						<blockquote>
+							<div>select ename,deptname from emp,dept where emp.deptno=dept.deptno;</div>
+						</blockquote>
+						<code>
+							外连接有分为左连接和右连接，具体定义如下。
+							<br />&nbsp&nbsp 左连接：包含所有的左边表中的记录甚至是右边表中没有和它匹配的记录
+							<br />&nbsp&nbsp 右连接：包含所有的右边表中的记录甚至是左边表中没有和它匹配的记录
+							<br />例如，查询 emp 中所有用户名和所在部门名称：
+						</code>
+						<blockquote>
+							<div>select ename,deptname from emp left join dept on emp.deptno=dept.deptno;</div>
+							<div>select ename,deptname from dept right join emp on dept.deptno=emp.deptno;</div>
+						</blockquote>
+						<code>
+							比较这个查询和上例中的查询， 都是查询用户名和部门名， 
+							<br />两者的区别在于本例中列出了所有的用户名，
+							<br />即使有的用户名（dony）并不存在合法的部门名称（部门号为 4，在 dept 中没有这个部门）；
+							<br />而上例中仅仅列出了存在合法部门的用户名和部门名称。
+							<br />右连接和左连接类似， 两者之间可以互相转化， 例如， 上面的例子可以改写为如下的右连接：<br />
+							<br />
+						</code>
+					<li>（6）子查询。</li>
+						<code>
+							某些情况下，当我们查询的时候，需要的条件是另外一个 select 语句的结果，
+							<br />这个时候，就要用到子查询。用于子查询的关键字主要包括 
+							<br /> <b>in、not in、=、!=、exists、not exists </b> 等。
+							<br />例如，从 emp 表中查询出所有部门在 dept 表中的所有记录：
+						</code>
+						<blockquote>
+							<div>select * from emp where deptno in(select deptno from dept);</div>
+							<div>如果子查询记录数唯一，还可以用=代替 in</div>
+							<div>select * from emp where deptno = (select deptno from dept);</div>
+							<div>&nbsp&nbsp ERROR 1242 (21000): Subquery returns more than 1 row</div>
+							<div>select * from emp where deptno = (select deptno from dept limit 1);</div>
+							<div>某些情况下，子查询可以转化为表连接，例如:</div>
+							<div>select * from emp where deptno in(select deptno from dept);</div>
+							<div>转换为表连接后：</div>
+							<div>select emp.* from emp ,dept where emp.deptno=dept.deptno;</div>
+						</blockquote>
+						<code>
+							<br />注意：子查询和表连接之间的转换主要应用在两个方面：
+							<br />MySQL 4.1 以前的版本不支持子查询，需要用表连接来实现子查询的功能
+							<br />表连接在很多情况下用于优化子查询<br />
+							<br />
+						</code>
+					<li>（7）记录联合。</li>
+						<code>
+							我们经常会碰到这样的应用， 将两个表的数据按照一定的查询条件查询出来后， 
+							<br />将结果合并到一起显示出来，这个时候， 
+							<br />就需要用 union 和 union all 关键字来实现这样的功能， 具体语法如下：
+						</code>
+						<code><b>
+							<br />SELECT * FROM t1
+							<br />UNION|UNION ALL
+							<br />SELECT * FROM t2
+							<br />……
+							<br />UNION|UNION ALL
+							<br />SELECT * FROM tn;
+						</b></code>
+						<code>
+							<br />UNION 和 UNION ALL 的主要区别是 UNION ALL 是把结果集直接合并在一起，
+							<br />而 UNION 是将UNION ALL 后的结果进行一次 DISTINCT，去除重复记录后的结果。
+							<br />来看下面例子，将 emp 和 dept 表中的部门编号的集合显示出来：
+						</code>
+						<blockquote>
+							<div>select deptno from emp union all select deptno from dept;</div>
+							<div>如果希望将结果去掉重复记录后显示</div>
+							<div>select deptno from emp union select deptno from dept;</div>
+						</blockquote>
+				</ul>
+			</li>
+			<br />
+		</ol>
+
+	<li> DCL (Data Control Language)</li>
+
+</ul>
+<hr>
+
+<ul>
+	<li>trigger</li>
+		<div>for each row是行级触发器，mysql只支持行级触发器。在oracle不写此句，则表示语句级触发器</div>
+		<div>
+		delimiter $
+		create trigger t6   #(必须要用before，否则生米煮成熟饭)
+		before insert on ord  for each row
+		begin
+		declare rnum int;
+		select num into rnum from goods where gid = new.gid;
+		if new.much > rnum then
+			set new.much := rnum;
+		end if;
+		update goods set num = num - new.much where gid = new.gid;
+			
+		end $
+		</div>
+		<div> show triggers ;</div>
+	<li>procedure 存储过程</li>
+		<div>
+			create procedure p1(in n int, out tatal int)
+			begin
+				declare num int default 0;
+				
+				while num < n do
+					set num := num +1;
+					set total := total + num;
+				end while $				
+			end $
+			
+			调用： out型会输出到变量
+			call p1(100, @summary);
+			select @summary ;
+			
+			调用： inout 型
+			set @curage = 18 ;
+			call p2(@curage);
+		</div>
+		
+		<div>show procedure status;</div>
+		<div>
+		if/else  控制结构
+		if condition then
+		statement
+		else
+		end
+		</div>
+		<div> 存储过程的括号里可以声明参数
+		语法是  [in/out/inout] 参数名  参数类型
+		</div>
+		<div>
+		控制结构： 顺序，选择，循环； 
+			while num <= 100 do
+				set total := total + num ;
+				set num := num + 1;
+			end while;
+		</div>
+		
+		<div>
+		repeat: 用法
+			repeat
+			sql statement;
+			sql statement;
+			until condition end repeat;
+		
+		create procedure p11()
+		begin
+			declare total int default 0;
+			declare i int default 0;
+			repeat
+			set i := i+1;
+			set total := total +1;
+			until i >= 100 end repeat;
+			
+			select total;
+		end $
+		</div>
+
+	<li>cursor 游标，游动的标志,取得资源集的单个控制权</li>
+	declare 声明
+	open
+	fetch
+	close
+	通过数据长度fetch
+	create procedure p12()
+	begin
+		# select * from goods;
+		declare row_gid int;  #临时变量
+		declare row_num int;
+		declare row_name varchar(20);
+		
+		declare cnt int default 0;
+		declare i int default 0;
+		declare getgoods cursor for select gid,num,name from goods;
+		
+		select count(*) into cnt from goods;
+		open getgoods;
+		repeat
+			set i := i+1;			
+			fetch getgoods into row_gid, row_num, row_name;
+			select row_num, row_name;   # 如果越界，则出现02000 的错误 
+		until i>=cnt end repeat;
+		
+		close getgoods;
+	end $
+	
+	使用越界标志：在mysql cursor中,可以用declare continue handler来操作一个越界标示
+	
+	create procedure p13()
+	begin
+		# select * from goods;
+		declare row_gid int;  #临时变量
+		declare row_num int;
+		declare row_name varchar(20);
+		
+		declare you int default 1;
+		declare getgoods cursor for select gid,num,name from goods;
+		delcare exit handler for NOT FOUND set you := 0;
+		#  continue/exit/undo 在出现NOT FOUND时，执行的动作
+		#  exit 触发后，后面的语句不在执行
+		#  undo 出发后，前面的语句撤销（但是，目前mysql还不支持）
+		
+		open getgoods;
+		repeat	
+			fetch getgoods into row_gid, row_num, row_name;
+			select row_num, row_name;   # 如果越界，则出现02000 的错误 
+		until you=0 end repeat;
+		
+		close getgoods;
+	end $
+	<li>mysql用户与权限管理</li>
+		<div>
+		1: 有没有连接权限
+		2: 有没有权限执行操作(如 增删该查 等)
+		
+		从哪来： host
+		你是谁:  user
+		密码：   password
+		这些信息存储在mysql数据库的user表中
+		修改密码：
+		update user set password = password("111111") where user='root' ;
+		flush privileges ; #冲刷权限，因为user表保存在内存中的
+		新增用户：
+		grant all on *.* to lisi@'192.168.1.%' identified by '111111';
+		</div>
+		<div> 
+		user表是全局范围； db表是库范围； tables_prv表是表范围
+		第二阶段的权限：mysql数据库的 db 表 --> 中
+		授权
+		grant [权限1, 权限2 ...] on *.* to user@'host' identified by 'password';
+		常用权限有： all, create, drop, insert, delete, update, select ...
+		grant all on *.* to lisi@'192.168.1.%' identified by '111111';
+		收回权限：
+		revoke all on *.* from lisi@'192.168.1.%';
+		
+		针对某个库授权：
+		grant all on ecshop.* to lisi@'192.168.1.%';
+		收回
+		revoke all on ecshop.* from lisi@'192.168.1.%';
+		
+		针对表授权：
+		garnt insert,update,select on gy3.goods to lisi@'192.168.1.%';
+		-- 提示，在开发中，某张表的数据是业务原始数据，不能被删除，可以在用户权限级别控制删除权限。
+		mysql的权限控制可以精确到列。
+		
+		</div>
+		<div> </div>
+	<li>mysql主从复制，</li>
+		<div> 
+		1：主服务器： binlog
+		2：从服务器： relaylog
+		3：从服务器如何有权限读取master的binlog？ （binlog 是比较敏感的）
+				授权，master要授权slave账户
+		4：从服务器用账号连接master
+		
+		主
+		binlog format = row/statement
+		statement: 2进制记录的执行语句，如 update
+		row:       2进制记录的是磁盘变化
+		
+		各有优点和应用场景，哪个好？
+		一般用 mixed混合的，由mysql自己选择最优
+		
+		从，一般也建议打开 binlog
+		
+		
+		</div>
+		<div> </div>
+	<li>查询语句</li>
+		<div>
+		使用商城例子： 比如 ecshop ; shopex; shopnc; magento
+		http://www.ecshop.com/
+		
+		</div>
+	<li></li>
+	<li></li>
+	<li></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
