@@ -1,0 +1,46 @@
+/usr/local/nginx/conf/nginx.conf
+user  www www;
+worker_processes auto;
+error_log  /home/wwwlogs/nginx_error.log  crit;
+pid        /usr/local/nginx/logs/nginx.pid;
+#root  /home/wwwroot/default;
+#Specifies the value for maximum file descriptors that can be opened by this process.
+worker_rlimit_nofile 51200;
+events
+        { use epoll; worker_connections 51200; multi_accept on; }
+
+http{
+	open_file_cache max=102400 inactive=60s;
+	open_file_cache_valid 80s;
+	open_file_cache_min_uses 1;
+}
+##########################################################################
+linux性能检测工具 nmon 可以实时检测并收集系统性能，系统资源使用数据。配合 nmon analyser 工具可以将nmon收集的系统性能数据以图表的形式直观的展现出来。
+32位 nmon 下载： http://pan.baidu.com/s/1sxkmI
+64位 nmon下载： http://pan.baidu.com/s/1rbr6C
+安装(以64位文件为例)： rpm -ivh  nmon-14g-1.el6.rf.x86_64.rpm
+nmon analyser 工具下载：http://pan.baidu.com/s/1Caaa8 
+使用：
+/usr/bin/nmon  -s 5 -c 60 -f  -m ./
+意思是：  -s  10   数据收集频率，隔10秒钟收集一次
+-c 60 共收集60次
+-f   使用默认文件名，以时间为名。可以使用 -F参数指定文件名
+-m  ./   数据文件保存目录，保存到当前目录下
+##########################################################################
+ab -n 200000 -c 1000 http://172.21.12.112/
+netstat -tnp | awk '{print $6}' | sort | uniq -c
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
